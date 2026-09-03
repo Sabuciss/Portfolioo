@@ -3,20 +3,24 @@ document.documentElement.classList.add("js");
 const revealItems = document.querySelectorAll(
     ".section, .contact, footer, .skill-card, .project, .education-item"
 );
+const projectImages = document.querySelectorAll(".project-image");
 
-const revealItem = (item) => {
-    item.classList.add("is-visible");
+const setItemVisibility = (item, isVisible) => {
+    item.classList.toggle("is-visible", isVisible);
+};
+
+const setProjectImageVisibility = (image, isVisible) => {
+    image.classList.toggle("in-view", isVisible);
 };
 
 if ("IntersectionObserver" in window) {
-    const revealObserver = new IntersectionObserver((entries, observer) => {
+    const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-                return;
+            if (entry.target.classList.contains("project-image")) {
+                setProjectImageVisibility(entry.target, entry.isIntersecting);
+            } else {
+                setItemVisibility(entry.target, entry.isIntersecting);
             }
-
-            revealItem(entry.target);
-            observer.unobserve(entry.target);
         });
     }, {
         threshold: 0.12,
@@ -24,6 +28,13 @@ if ("IntersectionObserver" in window) {
     });
 
     revealItems.forEach((item) => revealObserver.observe(item));
+
+    projectImages.forEach((image) => revealObserver.observe(image));
 } else {
-    revealItems.forEach(revealItem);
+    revealItems.forEach((item) => setItemVisibility(item, true));
+    projectImages.forEach((image) => setProjectImageVisibility(image, true));
 }
+
+projectImages.forEach((image) => {
+    image.setAttribute("tabindex", "0");
+});
